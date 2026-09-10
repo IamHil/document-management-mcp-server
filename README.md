@@ -57,3 +57,7 @@ Currently, documents are stored in memory using a Python dictionary.
 
 ![alt text](image-3.png)
 
+## MCP Client 
+
+![alt text](image-4.png)
+
