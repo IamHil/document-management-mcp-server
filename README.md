@@ -46,8 +46,7 @@ Currently, documents are stored in memory using a Python dictionary.
 │ Python Dictionary   │
 └─────────────────────┘
 
-![alt text](image.png)
-C:\Users\Support(TechnoSmart)\Desktop\MCP\document-management-mcp-server\src\docs\images\image.png
+![Architecture Diagram](src/docs/images/image.png)
 
 
 ## MCP Inspector 
