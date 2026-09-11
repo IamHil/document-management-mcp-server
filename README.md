@@ -67,3 +67,9 @@ Currently, documents are stored in memory using a Python dictionary.
 ![alt text](image.png)
 
 ![alt text](image-1.png)
+
+
+## Accessing Resources
+
+![alt text](image-2.png)
+

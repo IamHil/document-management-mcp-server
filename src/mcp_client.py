@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import AsyncExitStack
-
-from mcp import ClientSession, StdioServerParameters
+import json
+from mcp import ClientSession, StdioServerParameters, types
 from mcp.client.stdio import stdio_client
 
 
@@ -36,6 +36,22 @@ class MCPClient:
     async def call_tool(self, tool_name: str, tool_input: dict):
         return await self.session.call_tool(tool_name, tool_input)
 
+    async def read_resource(self, uri: str):
+
+        result = await self.session.read_resource(uri)
+    
+        resource = result.contents[0]
+
+        if isinstance(resource, types.TextResourceContents):
+            if resource.mimeType == "application/json":
+                return json.loads(resource.text)
+
+            return resource.text
+
+        return resource
+    
+
+
     async def cleanup(self):
         await self.exit_stack.aclose()
 
@@ -55,35 +71,17 @@ async def main():
             print(f"\n- {tool.name}")
             print(f"  Description: {tool.description}")
 
-        print("\nCalling read_doc_contents...")
-        edit_result = await client.call_tool(
-            "edit_document",
-            {
-                "doc_id": "report.pdf",
-                "old_str": "30m condenser tower",
-                "new_str": "25m condenser tower",
-            },
-        )
-        print("\nEdit result:")
-        print(edit_result)
+        print("\nReading document list resource....")
 
-        print("\nVerifying document...")
+        documents = await client.read_resource("docs://documents")
+        print("\nDocument list:")
+        print(documents)
 
-        verify_result = await client.call_tool(
-            "read_doc_contents",
-            {"doc_id": "report.pdf"},
-        )
+        print("\nReading report.pdf resource...")
 
-        print("\nUpdated document:")
-        print(verify_result)
-
-        result = await client.call_tool(
-            "read_doc_contents",
-            {"doc_id": "report.pdf"},
-        )
-
-        print("\nTool result:")
-        print(result)
+        report = await client.read_resource("docs://documents/report.pdf")
+        print("\nReport contents:")
+        print(report)
 
     finally:
         await client.cleanup()
