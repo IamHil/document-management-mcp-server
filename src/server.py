@@ -1,5 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 from pydantic import Field
+from mcp import types
 
 mcp = FastMCP("DocumentMCP", log_level="ERROR")
 
@@ -65,6 +66,44 @@ def fetch_doc(doc_id: str) -> str:
         raise ValueError(f"Doc with id {doc_id} not found")
 
     return docs[doc_id]
+
+@mcp.prompt(
+    name="format",
+    description="Rewrites the contents of the document in Markdown format."
+)
+
+def format_document(
+    doc_id: str = Field(description="Id of the document to format")
+
+) -> list[types.PromptMessage]:
+
+    prompt = f"""
+Your goal is to reformat a document to be written with Markdown syntax.
+
+The id of the document you need to reformat is:
+<document_id>{doc_id}</document_id>
+
+Use the read_doc_contents tool to read the contents of the document. 
+Then, rewrite the contents in Markdown format. 
+Add headers, bullet points, numbered lists, tables and other Markdown
+structure where appropriate.
+Preserve the original meaning of the document, but improve its structure and readability.
+Use the edit_document tool to make any changes to the document as needed.
+"""
+
+    return [
+        types.PromptMessage(
+            role="user",
+            content=types.TextContent(
+                type="text",
+                text=prompt
+            )
+        )
+    ]
+
+
+
+
 
 if __name__ == "__main__":
     mcp.run()

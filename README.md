@@ -73,3 +73,15 @@ Currently, documents are stored in memory using a Python dictionary.
 
 ![alt text](image-2.png)
 
+## Prompts
+
+### Server side Prompt 
+
+![alt text](image-3.png)
+
+
+### Client side Prompt
+
+![alt text](image-5.png)
+
+

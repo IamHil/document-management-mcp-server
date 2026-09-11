@@ -33,6 +33,17 @@ class MCPClient:
         result = await self.session.list_tools()
         return result.tools
 
+    # Adding List prompt functionality to the client
+    async def list_prompts(self) -> list[types.Prompt]:
+        result = await self.session.list_prompts()
+        return result.prompts
+
+    # Adding Get Prompt functionality to the client
+    async def get_prompt(self, prompt_name:str, args: dict[str, str]):
+        result = await self.session.get_prompt(prompt_name, args)
+        return result.messages
+
+
     async def call_tool(self, tool_name: str, tool_input: dict):
         return await self.session.call_tool(tool_name, tool_input)
 
@@ -50,7 +61,6 @@ class MCPClient:
 
         return resource
     
-
 
     async def cleanup(self):
         await self.exit_stack.aclose()
@@ -82,6 +92,21 @@ async def main():
         report = await client.read_resource("docs://documents/report.pdf")
         print("\nReport contents:")
         print(report)
+
+        print("\nListing available prompts...")
+        prompts = await client.list_prompts()
+        print("\nAvailable prompts:")
+        for prompt in prompts:
+            print(f"- {prompt.name}: {prompt.description}")
+
+        print("\nGetting 'format' prompt for 'report.pdf'...")
+        messages = await client.get_prompt(
+            "format",
+            {"doc_id": "report.pdf"}
+        )
+        print("\nPrompt messages:")
+        for message in messages:
+            print(message)
 
     finally:
         await client.cleanup()
