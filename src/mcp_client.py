@@ -3,6 +3,8 @@ from contextlib import AsyncExitStack
 import json
 from mcp import ClientSession, StdioServerParameters, types
 from mcp.client.stdio import stdio_client
+from pathlib import Path
+
 
 # Adding Sampling Summarize tool to the client
 
@@ -44,6 +46,20 @@ async def progress_callback(
     else:
         print(f"[PROGRESS] {progress}")
 
+# Roots
+
+async def list_roots_callback(context):
+    root_path = Path(__file__).resolve().parent.parent / "sample_documents"
+
+    return types.ListRootsResult(
+        roots=[
+            types.Root(
+                uri=root_path.as_uri(),
+                name="Sample Documents"
+            )
+        ]
+    )
+
 class MCPClient:
 
     def __init__(self):
@@ -63,7 +79,10 @@ class MCPClient:
         self.stdio, self.write = stdio_transport
 
         self.session = await self.exit_stack.enter_async_context(
-            ClientSession(self.stdio, self.write, sampling_callback=sampling_callback,logging_callback=logging_callback,)
+            ClientSession(self.stdio, self.write, 
+                          sampling_callback=sampling_callback,
+                          logging_callback=logging_callback,
+                          list_roots_callback=list_roots_callback,)
         )
 
         await self.session.initialize()
@@ -175,6 +194,44 @@ async def main():
 
         print("\nProcessing result:")
         print(process_result)
+
+        print("\nTesting MCP Roots...")
+
+        roots_result = await client.call_tool(
+            "list_root_documents",
+            {}
+        )
+
+        print("\nFiles available through Roots:")
+        print(roots_result)
+
+        print("\nTesting allowed root file...")
+
+        allowed_file = Path(__file__).resolve().parent.parent / "sample_documents" / "report.txt"
+
+        allowed_result = await client.call_tool(
+            "read_root_file",
+            {
+                "file_path": str(allowed_file)
+            }
+        )
+
+        print("\nAllowed file result:")
+        print(allowed_result)
+
+        print("\nTesting forbidden root file...")
+
+        forbidden_file = Path(__file__).resolve().parent.parent / "outside_documents" / "secret.txt"
+
+        forbidden_result = await client.call_tool(
+            "read_root_file",
+            {
+                "file_path": str(forbidden_file)
+            }
+        )
+
+        print("\nForbidden file result:")
+        print(forbidden_result)
 
     finally:
         await client.cleanup()

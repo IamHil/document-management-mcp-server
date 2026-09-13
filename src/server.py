@@ -2,6 +2,10 @@ from mcp.server.fastmcp import FastMCP , Context
 from pydantic import Field
 from mcp import types
 import asyncio
+from pathlib import Path
+from urllib.parse import urlparse, unquote
+from urllib.request import url2pathname
+
 
 mcp = FastMCP("DocumentMCP", log_level="ERROR")
 
@@ -32,6 +36,7 @@ def read_document(
     name="edit_document",
     description="Edit a document by replacing a string in the document content with a new string."
 )
+
 def edit_document(
     doc_id: str = Field(description="Id of the document that will be edited"),
     old_str: str = Field(
@@ -55,6 +60,7 @@ def edit_document(
     "docs://documents",
     mime_type="application/json"
 )
+
 def list_docs() -> list[str]:
     return list(docs.keys())
 
@@ -62,6 +68,7 @@ def list_docs() -> list[str]:
     "docs://documents/{doc_id}",
     mime_type="text/plain"
 )
+
 def fetch_doc(doc_id: str) -> str:
     if doc_id not in docs:
         raise ValueError(f"Doc with id {doc_id} not found")
@@ -109,9 +116,6 @@ async def summarize(
         return result.content.text
 
     raise ValueError("Unexpected content type in summarize result: {result.content.type}")
-
-
-
 
 
 @mcp.prompt(
@@ -186,6 +190,74 @@ async def process_document(
 
     return f"Processed document '{doc_id}': {document}"
 
+
+def is_path_allowed(path: Path, roots: list[types.Root]) -> bool:
+    resolved_path = path.resolve()
+
+    for root in roots:
+        root_path = Path(url2pathname(urlparse(str(root.uri)).path)).resolve()
+
+        try:
+            resolved_path.relative_to(root_path)
+            return True
+        except ValueError:
+            continue
+
+    return False
+
+# Roots
+
+@mcp.tool(
+    name="list_root_documents",
+    description="Lists files available inside the client's approved MCP roots."
+)
+async def list_root_documents(
+    *,
+    context: Context
+) -> list[str]:
+    result = await context.session.list_roots()
+
+    files = []
+
+    for root in result.roots:
+        root_path = Path(url2pathname(urlparse(str(root.uri)).path))
+
+        if not root_path.exists():
+            continue
+
+        for path in root_path.rglob("*"):
+            if path.is_file() and is_path_allowed(path, result.roots):
+                files.append(str(path))
+
+    return files
+
+
+@mcp.tool(
+    name="read_root_file",
+    description="Reads a file only if it is inside one of the client's approved MCP roots."
+)
+
+async def read_root_file(
+    file_path: str,
+    *,
+    context: Context
+) -> str:
+    path = Path(file_path).resolve()
+
+    result = await context.session.list_roots()
+
+    if not is_path_allowed(path, result.roots):
+        raise ValueError(
+            f"Access denied: '{file_path}' is outside the client's approved MCP roots."
+        )
+
+    if not path.exists():
+        raise ValueError(f"File not found: {file_path}")
+
+    if not path.is_file():
+        raise ValueError(f"Path is not a file: {file_path}")
+
+    return path.read_text(encoding="utf-8")
 
 
 if __name__ == "__main__":

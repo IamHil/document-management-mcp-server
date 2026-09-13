@@ -112,4 +112,88 @@ Currently, documents are stored in memory using a Python dictionary.
 
 ![alt text](image-6.png)
 
+## Roots 
+
+![alt text](image-7.png)
+
+# Complete Model of the following features 
+
+TOOLS
+Server → Client
+"Here's functionality you can call."
+
+
+RESOURCES
+Server → Client
+"Here's data you can read."
+
+
+PROMPTS
+Server → Client
+"Here's a reusable prompt."
+
+
+SAMPLING
+Server → Client → LLM → Client → Server
+"Ask the client's LLM to generate something."
+
+
+LOGGING / PROGRESS
+Server → Client
+"Here's what's happening while I'm working."
+
+
+ROOTS
+Client → Server
+"These filesystem locations are in scope."
+
+
+## Json Message types
+
+                 MCP Connection
+              ┌──────────────────┐
+              │                  │
+Client  ◄─────┤   Bidirectional  ├─────► Server
+              │                  │
+              └──────────────────┘
+
+
+Client → Server
+
+initialize
+tools/list
+tools/call
+resources/read
+
+Server
+  │
+  │ CreateMessage Request
+  ↓
+Client
+  │
+  │ Sampling Result
+  ↓
+Server
+
+             ┌─────────────────────┐
+             │    MCP Connection   │
+             └─────────────────────┘
+
+Client ───────────────► Server
+       tools/call
+
+Client ◄────────────── Server
+       sampling
+
+Client ◄────────────── Server
+       roots
+
+Client ◄────────────── Server
+       logging
+
+Client ◄────────────── Server
+       progress
+
+
+![alt text](image-8.png)  
 
