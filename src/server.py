@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP , Context
 from pydantic import Field
 from mcp import types
+import asyncio
 
 mcp = FastMCP("DocumentMCP", log_level="ERROR")
 
@@ -99,8 +100,8 @@ async def summarize(
                 )
             )
         ],
-        maxTokens=4000,
-        systemPrompt="You are a helpful assistant that summarizes text.",
+        max_tokens=4000,
+        system_prompt="You are a helpful assistant that summarizes text.",
 
     )
 
@@ -147,7 +148,43 @@ Use the edit_document tool to make any changes to the document as needed.
         )
     ]
 
+# Logging and Notification 
 
+@mcp.tool(
+    name="process_document",
+    description="Processes a document while reporting logs and progress."
+)
+
+async def process_document(
+    doc_id: str = Field(description="Id of the document to process"),
+    *,
+    cxt: Context
+) -> str:
+
+    if doc_id not in docs:
+        raise ValueError(f"Document with id '{doc_id}' not found.")
+
+    await cxt.info("Starting document processing...")
+    await cxt.report_progress(10,100)
+    await asyncio.sleep(1)
+
+    await cxt.info("Reading document...")
+    document = docs[doc_id]
+    await cxt.report_progress(30, 100)
+    await asyncio.sleep(1)
+
+    await cxt.info("Analyzing document...")
+    await cxt.report_progress(60, 100)
+    await asyncio.sleep(1)
+
+    await cxt.info("Preparing final result...")
+    await cxt.report_progress(90, 100)
+    await asyncio.sleep(1)
+
+    await cxt.info("Document processing complete.")
+    await cxt.report_progress(100, 100)
+
+    return f"Processed document '{doc_id}': {document}"
 
 
 

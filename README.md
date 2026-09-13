@@ -108,3 +108,8 @@ Currently, documents are stored in memory using a Python dictionary.
 └──────────────┘       └──────────────┘
 
 
+## Log and Notification 
+
+![alt text](image-6.png)
+
+

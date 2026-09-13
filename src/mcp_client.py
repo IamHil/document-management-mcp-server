@@ -25,6 +25,24 @@ async def sampling_callback(
         stopReson="endTurn",
     )
 
+# Logging and Notification
+
+async def logging_callback(params: types.LoggingMessageNotificationParams):
+    print(f"\n[LOG] {params.data}")
+
+async def progress_callback(
+    progress: float,
+    total: float | None,
+    message: str | None
+):
+    if total is not None:
+        percentage = (progress / total) * 100
+        print(
+            f"[PROGRESS] {progress}/{total} "
+            f"({percentage:.1f}%)"
+        )
+    else:
+        print(f"[PROGRESS] {progress}")
 
 class MCPClient:
 
@@ -45,7 +63,7 @@ class MCPClient:
         self.stdio, self.write = stdio_transport
 
         self.session = await self.exit_stack.enter_async_context(
-            ClientSession(self.stdio, self.write, sampling_callback=sampling_callback,)
+            ClientSession(self.stdio, self.write, sampling_callback=sampling_callback,logging_callback=logging_callback,)
         )
 
         await self.session.initialize()
@@ -65,8 +83,8 @@ class MCPClient:
         return result.messages
 
 
-    async def call_tool(self, tool_name: str, tool_input: dict):
-        return await self.session.call_tool(tool_name, tool_input)
+    async def call_tool(self, tool_name: str, tool_input: dict, progress_callback=None,):
+        return await self.session.call_tool(tool_name, tool_input, progress_callback=progress_callback)
 
     async def read_resource(self, uri: str):
 
@@ -144,6 +162,19 @@ async def main():
 
         print("\nSampling result:")
         print(sampling_result)
+
+        print("\nTesting logging and progress notifications...")
+
+        process_result = await client.call_tool(
+            "process_document",
+            {
+                "doc_id": "report.pdf"
+            },
+            progress_callback=progress_callback,
+        )
+
+        print("\nProcessing result:")
+        print(process_result)
 
     finally:
         await client.cleanup()
