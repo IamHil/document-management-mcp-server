@@ -84,4 +84,27 @@ Currently, documents are stored in memory using a Python dictionary.
 
 ![alt text](image-5.png)
 
+## Sampling 
+
+                 MCP
+┌──────────────┐       ┌──────────────┐
+│ MCP Server   │       │ MCP Client   │
+│              │       │              │
+│ summarize()  │       │              │
+│      │       │       │              │
+│      │ create_message()            │
+│      ├────────────────────────────►│
+│              │       │ sampling    │
+│              │       │ callback    │
+│              │       │      │       │
+│              │       │      ▼       │
+│              │       │   Claude    │
+│              │       │      │       │
+│              │       │      ▼       │
+│              │◄─────────────────────┤
+│      │       │       │              │
+│      ▼       │       │              │
+│  summary     │       │              │
+└──────────────┘       └──────────────┘
+
 

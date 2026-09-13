@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP , Context
 from pydantic import Field
 from mcp import types
 
@@ -66,6 +66,52 @@ def fetch_doc(doc_id: str) -> str:
         raise ValueError(f"Doc with id {doc_id} not found")
 
     return docs[doc_id]
+
+#  Adding Sampling Summarize tool 
+
+@mcp.tool(
+    name="summarize",
+    description="Summarizes the contents of a document."
+)
+
+async def summarize(
+    text_to_summarize: str = Field(
+        description="The text to summarize."
+    ),
+    ctx: Context = None,
+    
+) -> str:
+
+    prompt = f"""   
+    Please summarize the following text:
+
+    {text_to_summarize}
+
+    """
+
+    result = await ctx.session.create_message(
+        messages=[
+            types.SamplingMessage(
+                role="user",
+                content=types.TextContent(
+                    type="text",
+                    text=prompt
+                )
+            )
+        ],
+        maxTokens=4000,
+        systemPrompt="You are a helpful assistant that summarizes text.",
+
+    )
+
+    if result.content.type == "text":
+        return result.content.text
+
+    raise ValueError("Unexpected content type in summarize result: {result.content.type}")
+
+
+
+
 
 @mcp.prompt(
     name="format",

@@ -4,6 +4,27 @@ import json
 from mcp import ClientSession, StdioServerParameters, types
 from mcp.client.stdio import stdio_client
 
+# Adding Sampling Summarize tool to the client
+
+async def sampling_callback(
+        context,
+        params: types.CreateMessageRequestParams,
+
+):
+    print("Sampling callback invoked with params:")
+    return types.CreateMessageResult(
+        role="assistant",
+        model="local-sampling-demo",
+        content=types.TextContent(
+            type="text",
+            text=(
+                "[Sampling Response]\n"
+                "The provided text was processed by the MCP client's sampling callback."
+            ),
+        ),
+        stopReson="endTurn",
+    )
+
 
 class MCPClient:
 
@@ -24,7 +45,7 @@ class MCPClient:
         self.stdio, self.write = stdio_transport
 
         self.session = await self.exit_stack.enter_async_context(
-            ClientSession(self.stdio, self.write)
+            ClientSession(self.stdio, self.write, sampling_callback=sampling_callback,)
         )
 
         await self.session.initialize()
@@ -107,6 +128,22 @@ async def main():
         print("\nPrompt messages:")
         for message in messages:
             print(message)
+
+        print("\nTesting Sampling...")
+
+        sampling_result = await client.call_tool(
+            "summarize",
+            {
+                "text_to_summarize": (
+                    "The Model Context Protocol provides a standardized "
+                    "way for AI applications to communicate with external "
+                    "tools, resources, and data sources."
+                )
+            },
+        )
+
+        print("\nSampling result:")
+        print(sampling_result)
 
     finally:
         await client.cleanup()
