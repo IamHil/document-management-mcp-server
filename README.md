@@ -47,43 +47,51 @@ Currently, documents are stored in memory using a Python dictionary.
 └─────────────────────┘
 ```
 
-![Architecture Diagram](src/docs/images/image.png)
+![MCP server architecture](src/docs/images/architecture-diagram.png)
 
 
-## MCP Inspector 
+## MCP Inspector
 
-![alt text](image-1.png)
+![MCP Inspector resources view](src/docs/images/resources-overview.png)
 
-![alt text](image-2.png)
+![MCP client output](src/docs/images/mcp-client-output.png)
 
-![alt text](image-3.png)
+![MCP Inspector prompts view](src/docs/images/prompts-overview.png)
+
+### Inspector snapshots
+
+![MCP Inspector session startup](src/docs/images/inspector-session-startup.png)
+
+![MCP Inspector tool result](src/docs/images/inspector-tool-result.png)
+
+![MCP Inspector resource result](src/docs/images/inspector-resource-result.png)
 
 ## MCP Client 
 
-![alt text](image-4.png)
+![MCP client](src/docs/images/mcp-client.png)
 
 
 ## Defining Resources
 
-![alt text](image.png)
+![Resource definition](src/docs/images/resources-definition.png)
 
-![alt text](image-1.png)
+![Resources overview](src/docs/images/resources-overview.png)
 
 
 ## Accessing Resources
 
-![alt text](image-2.png)
+![MCP client resource access](src/docs/images/mcp-client-output.png)
 
 ## Prompts
 
 ### Server side Prompt 
 
-![alt text](image-3.png)
+![Server-side prompt](src/docs/images/prompts-overview.png)
 
 
 ### Client side Prompt
 
-![alt text](image-5.png)
+![Client-side prompt](src/docs/images/prompts-client.png)
 
 ## Sampling 
 
@@ -111,13 +119,13 @@ Currently, documents are stored in memory using a Python dictionary.
 
 ## Log and Notification 
 
-![alt text](image-6.png)
+![Logging and notifications](src/docs/images/logging-notifications.png)
 
 ## Roots 
 
-![alt text](image-7.png)
+![Roots](src/docs/images/roots.png)
 
-# Complete Model of the following features 
+## Complete Model of the following features
 
 TOOLS
 Server → Client
@@ -196,7 +204,7 @@ Client ◄────────────── Server
        progress
 
 
-![alt text](image-8.png)  
+![JSON message types](src/docs/images/json-message-types.png)
 
 ## STDIO
 
@@ -208,9 +216,9 @@ STDIO is a transport that communicates between the MCP client and server using t
 Streamable HTTP combines HTTP request/response with streaming so MCP can preserve its bidirectional communication model as much as HTTP allows.
 
 
-![alt text](image-9.png)
+![Streamable HTTP](src/docs/images/streamable-http.png)
 
-# Current Architecture 
+## Current Architecture
 
                     MCP Protocol
                          │
@@ -224,9 +232,14 @@ Streamable HTTP combines HTTP request/response with streaming so MCP can preserv
               ▼                     ▼
        MCP Server             MCP Server
 
-![alt text](image-10.png)
+![Streamable HTTP architecture](src/docs/images/streamable-http-architecture.png)
 
-![alt text](image-11.png)
+![Streamable HTTP Inspector](src/docs/images/streamable-http-inspector.png)
 
-![alt text](image-12.png)
+![Streamable HTTP completion](src/docs/images/streamable-http-complete.png)
 
+## Completion of MCP
+
+https://academy.claude.com/verify/7d506466ceb76c932380746d7d2f3fbc
+
+https://academy.claude.com/verify/bcfdd0026bf9305bc508928be1b54c4e
