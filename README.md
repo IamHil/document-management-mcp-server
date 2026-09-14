@@ -45,6 +45,7 @@ Currently, documents are stored in memory using a Python dictionary.
 │                     │
 │ Python Dictionary   │
 └─────────────────────┘
+```
 
 ![Architecture Diagram](src/docs/images/image.png)
 
@@ -196,4 +197,36 @@ Client ◄────────────── Server
 
 
 ![alt text](image-8.png)  
+
+## STDIO
+
+STDIO is a transport that communicates between the MCP client and server using the server process's standard input and standard output.
+
+## StreamableHTTP in depth
+
+
+Streamable HTTP combines HTTP request/response with streaming so MCP can preserve its bidirectional communication model as much as HTTP allows.
+
+
+![alt text](image-9.png)
+
+# Current Architecture 
+
+                    MCP Protocol
+                         │
+              ┌──────────┴──────────┐
+              │                     │
+            STDIO          Streamable HTTP
+              │                     │
+              ▼                     ▼
+       stdin/stdout             HTTP / SSE
+              │                     │
+              ▼                     ▼
+       MCP Server             MCP Server
+
+![alt text](image-10.png)
+
+![alt text](image-11.png)
+
+![alt text](image-12.png)
 

@@ -260,6 +260,11 @@ async def read_root_file(
     return path.read_text(encoding="utf-8")
 
 
+# if __name__ == "__main__":
+#     mcp.run()
+
+# Temp Change 
+
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="streamable-http")
 
